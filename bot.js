@@ -9,27 +9,64 @@ client.on('ready', function (evt) {
     console.log("Bot is ready");
     client.user.setActivity("Beep Boop. I am a bot.");
     //setCronJob();
-    let roles = client.guilds.first().roles
+    let guild = client.guilds.first()
+
+    let rolesToRemove = findRingerRoles(guild);
+    FindAndRemoveRingerRoles(guild, rolesToRemove)
+});
+
+
+function findRingerRoles(guild)
+{
+    let roles = guild.roles;
+    let results = new Map();
 
     for (var [key, value] of roles) {
+        if(value.name.toLowerCase().includes("ringer"))
+        {
+            results.set(key, value);
+        }
         console.log(value.name);
       }
 
-    let users = client.guilds.first().members
+      return results;
+}
+
+function FindAndRemoveRingerRoles(guild, ringerRoles)
+{
+    let users = guild.members;
+    let result = new Map();
 
     for (var [key, value] of users)
     {
-        console.log(value.roles)
+        searchUserForRingerRoles(value, ringerRoles);
     }
+}
 
-});
-
-client.on('message', message => {
-    
-    var member = message.member;
-    console.log(member.nickname)
+function searchUserForRingerRoles(user, ringerRoles)
+{
+    for (var [key, value] of user.roles)
+    {
+        removeRingerRolesFromUser(user, value, ringerRoles);
     }
-  );
+}
+
+function removeRingerRolesFromUser(user, role, ringerRoles)
+{
+    for (var [key, value] of ringerRoles)
+    {
+        if(role.name == value.name)
+        {
+            removeRingerRole(user, role);
+        }
+    }
+}
+
+function removeRingerRole(user, role)
+{
+    user.removeRole(role, "Ringer role expired")
+}
+
 
 function setCronJob()
 {
