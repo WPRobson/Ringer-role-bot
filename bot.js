@@ -7,14 +7,8 @@ client.login(auth.token);
 
 client.on('ready', function (evt) {
     console.log("Bot is ready");
-    client.user.setActivity("Beep Boop. I am a bot.");
-    //setCronJob();
-    let guild = client.guilds.first()
-
-    let rolesToRemove = findRingerRoles(guild);
-    FindAndRemoveRingerRoles(guild, rolesToRemove)
+    setCronJob();
 });
-
 
 function findRingerRoles(guild)
 {
@@ -22,20 +16,22 @@ function findRingerRoles(guild)
     let results = new Map();
 
     for (var [key, value] of roles) {
-        if(value.name.toLowerCase().includes("ringer"))
+        if(value.name.toLowerCase().includes("ringers"))
         {
             results.set(key, value);
+            console.log(value.name);
         }
-        console.log(value.name);
       }
 
       return results;
 }
 
-function FindAndRemoveRingerRoles(guild, ringerRoles)
+function FindAndRemoveRingerRoles(guild)
 {
     let users = guild.members;
     let result = new Map();
+
+    let ringerRoles = findRingerRoles(guild);
 
     for (var [key, value] of users)
     {
@@ -43,34 +39,41 @@ function FindAndRemoveRingerRoles(guild, ringerRoles)
     }
 }
 
-function searchUserForRingerRoles(user, ringerRoles)
+function searchUserForRingerRoles(member, ringerRoles)
 {
-    for (var [key, value] of user.roles)
+    for (var [key, value] of member.roles)
     {
-        removeRingerRolesFromUser(user, value, ringerRoles);
+        removeRingerRolesFromUser(member, value, ringerRoles);
     }
 }
 
-function removeRingerRolesFromUser(user, role, ringerRoles)
+function removeRingerRolesFromUser(member, role, ringerRoles)
 {
     for (var [key, value] of ringerRoles)
     {
-        if(role.name == value.name)
+        if(role.name.toLowerCase() == value.name.toLowerCase())
         {
-            removeRingerRole(user, role);
+            removeRingerRole(member, role);
         }
     }
 }
 
-function removeRingerRole(user, role)
+function removeRingerRole(member, role)
 {
-    user.removeRole(role, "Ringer role expired")
+    member.removeRole(role, "Ringer role expired")
+    console.log(`${role.name} was removed from ${member.user.username}`)
 }
 
 
 function setCronJob()
 {
-    var j = schedule.scheduleJob('5 * * * * *', function(){
-    console.log('The answer to life, the universe, and everything!');
+    var j = schedule.scheduleJob('0 0 0 * * 0', function(){ //'0 0 0 * * 0'
+        let guilds = client.guilds;
+
+        for(var [key, value] of guilds)
+        {
+            FindAndRemoveRingerRoles(value)
+        }
+
     });
 }
