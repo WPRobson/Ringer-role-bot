@@ -6,24 +6,24 @@ const client = new Discord.Client();
 client.login(auth.token);
 
 
-async function run() {
+ function run() {
   console.log("Starting run")
   let guilds = client.guilds;
   guilds.forEach(value => {
-   await FindAndRemoveRingerRoles(value);
+  FindAndRemoveRingerRoles(value);
   });
 }
 
-async function FindAndRemoveRingerRoles(guild) {
+function FindAndRemoveRingerRoles(guild) {
   const users = guild.members;
-  const ringerRoles = await findRingerRoles(guild);
+  const ringerRoles =  findRingerRoles(guild);
 
   users.forEach(value => {
-    await searchUserForRingerRoles(value, ringerRoles);
+    searchUserForRingerRoles(value, ringerRoles);
   });
 }
 
-async function findRingerRoles(guild) {
+ function findRingerRoles(guild) {
   const roles = guild.roles;
   const results = new Map();
 
@@ -37,21 +37,21 @@ async function findRingerRoles(guild) {
   return results;
 }
 
-async function searchUserForRingerRoles(member, ringerRoles) {
+ function searchUserForRingerRoles(member, ringerRoles) {
   member.roles.forEach(value => {
-    await removeRingerRolesFromUser(member, value, ringerRoles);
+     removeRingerRolesFromUser(member, value, ringerRoles);
   });
 }
 
-async function removeRingerRolesFromUser(member, role, ringerRoles) {
+ function removeRingerRolesFromUser(member, role, ringerRoles) {
   ringerRoles.forEach(value => {
     if (role.name.toLowerCase() === value.name.toLowerCase()) {
-     await removeRingerRole(member, role);
+      removeRingerRole(member, role);
     }
   });
 }
 
-async function removeRingerRole(member, role) {
+ function removeRingerRole(member, role) {
   member.removeRole(role, "Ringer role expired");
   console.log(`${role.name} was removed from ${member.user.username}`);
 }
